@@ -25,7 +25,7 @@
   "homepage": "https://github.com/WordPress/wporg-two-factor#readme",
   "dependencies": {
     "@wordpress/base-styles": "^4.17.0",
-    "@wordpress/env": "^5.13.0"
+    "@wordpress/env": "^10.1.0"
   },
   "workspaces": {
     "packages": [
