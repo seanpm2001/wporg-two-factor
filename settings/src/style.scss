@@ -21,6 +21,14 @@ $alert-blue: #72aee6;
 	position: relative;
 	font-size: 13px;
 
+	> div.initial-load {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		height: 400px;
+		box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 0px 1px;
+	}
+
 	h3,
 	h4 {
 		clear: none;
