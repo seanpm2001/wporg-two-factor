@@ -108,17 +108,11 @@ export default function EmailAddress() {
 				<Button
 					onClick={ handleSave }
 					disabled={ ! hasEdits || isSaving }
-					isPrimary={ hasEdits }
-					isSecondary={ ! hasEdits }
+					isPrimary={ hasEdits && ! justChangedEmail }
+					isSecondary={ ! hasEdits || justChangedEmail }
+					isBusy={ isSaving && ! justChangedEmail }
 				>
-					{ isSaving ? (
-						<>
-							<Spinner />
-							Updating
-						</>
-					) : (
-						'Update Email Address'
-					) }
+					{ isSaving && ! justChangedEmail ? 'Updating' : 'Update Email Address' }
 				</Button>
 			</p>
 		</>
