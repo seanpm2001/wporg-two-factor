@@ -133,7 +133,7 @@ export default function WebAuthn() {
 
 						{ keys.length > 0 && (
 							<Button
-								variant="tertiary"
+								variant="secondary"
 								onClick={
 									webAuthnEnabled ? showConfirmDisableModal : toggleProvider
 								}
@@ -191,10 +191,10 @@ function ConfirmDisableKeys( { onConfirm, onClose, disabling } ) {
 			) : (
 				<div className="wporg-2fa__submit-actions">
 					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Disable
+						Disable security keys
 					</Button>
 
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button variant="secondary" onClick={ onClose }>
 						Cancel
 					</Button>
 				</div>

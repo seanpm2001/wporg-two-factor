@@ -455,7 +455,7 @@ function ConfirmDisableApp( { onConfirm, onClose, disabling } ) {
 			) : (
 				<div className="wporg-2fa__submit-actions">
 					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Disable
+						Disable Two-Factor app
 					</Button>
 
 					<Button variant="tertiary" onClick={ onClose }>
