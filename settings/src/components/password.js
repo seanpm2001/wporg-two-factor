@@ -172,6 +172,7 @@ export default function Password() {
 					isSecondary={ ! editedRecord.password }
 					disabled={ ! editedRecord.password }
 					type="submit"
+					isBusy={ isSaving }
 				>
 					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>
