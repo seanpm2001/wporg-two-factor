@@ -109,6 +109,8 @@ function login_footer_revalidate_customizations() {
 		.login-action-revalidate_2fa #login_error {
 			box-shadow: none;
 			background-color: #f4a2a2;
+			padding: 16px;
+			margin-bottom: 16px;
 		}
 
 		.login-action-revalidate_2fa #loginform {

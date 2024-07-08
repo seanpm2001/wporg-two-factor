@@ -51,29 +51,37 @@ $alert-blue: #72aee6;
 	.components-card__body p:first-child {
 		margin-top: 0;
 	}
+
+	label {
+		text-transform: initial;
+		font-size: 14px;
+		font-weight: 400;
+		margin-bottom: 8px;
+	}
 }
 
 .wporg-2fa__screen-key {
 	display: flex;
 	align-items: center;
-	margin: 8px 0 0;
+	margin: 12px 0 6px;
 	gap: 4px;
-	font-weight: 600;
 }
 
-.wporg-2fa__screen-intro {
-	margin-bottom: 26px;
+.wporg-2fa__screen-intro,
+.wporg-2fa__screen-intro p {
+	margin-bottom: 24px;
 }
 
 .wporg-2fa__submit-actions {
-	margin-top: 26px;
+	margin-top: 24px;
+	margin-bottom: 0;
 	display: flex;
 	justify-content: flex-start;
-	gap: 16px 20px;
+	gap: 16px 10px;
 	flex-wrap: wrap;
 
 	& + .components-notice.is-error {
-		margin-top: 40px;
+		margin-top: 24px;
 	}
 }
 
