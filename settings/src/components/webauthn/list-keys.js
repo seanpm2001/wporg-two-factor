@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, Modal, Notice, Spinner } from '@wordpress/components';
+import { Button, Modal, Notice } from '@wordpress/components';
 import { useCallback, useContext, useState } from '@wordpress/element';
 import { Icon, cancelCircleFilled, key as keyIcon } from '@wordpress/icons';
 
