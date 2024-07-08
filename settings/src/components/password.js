@@ -167,7 +167,12 @@ export default function Password() {
 			) }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary disabled={ ! editedRecord.password } type="submit">
+				<Button
+					isPrimary={ editedRecord.password }
+					isSecondary={ ! editedRecord.password }
+					disabled={ ! editedRecord.password }
+					type="submit"
+				>
 					{ isSaving ? 'Saving...' : 'Save password' }
 				</Button>
 

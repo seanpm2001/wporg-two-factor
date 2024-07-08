@@ -106,9 +106,10 @@ export default function EmailAddress() {
 
 			<p className="wporg-2fa__submit-actions">
 				<Button
-					variant="primary"
 					onClick={ handleSave }
 					disabled={ ! hasEdits || isSaving }
+					isPrimary={ hasEdits }
+					isSecondary={ ! hasEdits }
 				>
 					{ isSaving ? (
 						<>
