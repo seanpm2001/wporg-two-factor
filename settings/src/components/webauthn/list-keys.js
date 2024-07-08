@@ -107,21 +107,15 @@ function ConfirmRemoveKey( { keyToRemove, onConfirm, onClose, deleting, error } 
 				</span>
 			</p>
 
-			{ deleting ? (
-				<div className="wporg-2fa__process-status">
-					<Spinner />
-				</div>
-			) : (
-				<div className="wporg-2fa__submit-actions">
-					<Button variant="primary" isDestructive onClick={ onConfirm }>
-						Delete key
-					</Button>
+			<div className="wporg-2fa__submit-actions">
+				<Button variant="primary" isBusy={ deleting } isDestructive onClick={ onConfirm }>
+					Delete key
+				</Button>
 
-					<Button variant="secondary" onClick={ onClose }>
-						Cancel
-					</Button>
-				</div>
-			) }
+				<Button variant="secondary" onClick={ onClose }>
+					Cancel
+				</Button>
+			</div>
 
 			{ error && (
 				<Notice status="error" isDismissible={ false }>
