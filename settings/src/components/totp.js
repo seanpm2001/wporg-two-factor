@@ -386,7 +386,7 @@ function Manage() {
 			</div>
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary onClick={ showConfirmDisableModal }>
+				<Button variant="secondary" onClick={ showConfirmDisableModal }>
 					Disable Two-Factor app
 				</Button>
 			</p>
