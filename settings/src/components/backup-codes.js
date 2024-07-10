@@ -148,7 +148,12 @@ function Setup( { setRegenerating } ) {
 			) }
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary disabled={ ! hasPrinted } onClick={ handleFinished }>
+				<Button
+					isPrimary={ hasPrinted }
+					isSecondary={ ! hasPrinted }
+					disabled={ ! hasPrinted }
+					onClick={ handleFinished }
+				>
 					All Finished
 				</Button>
 			</p>
