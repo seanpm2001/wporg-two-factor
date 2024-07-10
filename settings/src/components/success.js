@@ -15,7 +15,7 @@ import { Icon, check } from '@wordpress/icons';
  * @param props.message
  */
 export default function Success( { message, afterTimeout } ) {
-	const [ hasTimer, setHasTimer ] = useState( false );
+	const [ hasTimer, setHasTimer ] = useState( true );
 
 	if ( ! hasTimer ) {
 		// Time matches the length of the CSS animation property on .wporg-2fa__success
@@ -29,7 +29,7 @@ export default function Success( { message, afterTimeout } ) {
 				<div className="wporg-2fa__success-animation">
 					<Icon icon={ check } />
 				</div>
-				<p>{ message }</p>
+				<div>{ message }</div>
 			</div>
 		</Flex>
 	);
