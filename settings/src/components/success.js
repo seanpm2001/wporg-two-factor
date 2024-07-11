@@ -15,7 +15,7 @@ import { Icon, check } from '@wordpress/icons';
  * @param props.message
  */
 export default function Success( { message, afterTimeout } ) {
-	const [ hasTimer, setHasTimer ] = useState( true );
+	const [ hasTimer, setHasTimer ] = useState( false );
 
 	if ( ! hasTimer ) {
 		// Time matches the length of the CSS animation property on .wporg-2fa__success
