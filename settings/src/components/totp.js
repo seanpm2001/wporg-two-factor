@@ -17,15 +17,20 @@ import Success from './success';
 
 export default function TOTP() {
 	const {
-		user: { totpEnabled },
+		user: { backupCodesEnabled, totpEnabled },
 		navigateToScreen,
 	} = useContext( GlobalContext );
 	const [ success, setSuccess ] = useState( false );
 
 	const afterTimeout = useCallback( () => {
 		setSuccess( false );
-		navigateToScreen( 'backup-codes' );
-	}, [ navigateToScreen ] );
+
+		if ( ! backupCodesEnabled ) {
+			navigateToScreen( 'backup-codes' );
+		} else {
+			navigateToScreen( 'account-status' );
+		}
+	}, [ backupCodesEnabled, navigateToScreen ] );
 
 	if ( success ) {
 		return (
