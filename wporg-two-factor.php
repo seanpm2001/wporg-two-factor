@@ -399,22 +399,3 @@ add_filter( 'two_factor_provider_classname_TwoFactor_Provider_WebAuthn', functio
 
 	return __NAMESPACE__ . '\WPORG_TwoFactor_Provider_WebAuthn';
 } );
-
-// Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
-// Hotfix for https://github.com/WordPress/gutenberg/pull/48268
-add_filter( 'block_type_metadata', function( $metadata ) {
-	if ( isset( $metadata['viewScript'] ) && ! empty( $metadata['file'] ) && ! str_contains( $metadata['file'], 'plugins/gutenberg/' ) ) {
-		$metadata['_viewScript'] = $metadata['viewScript'];
-		unset( $metadata['viewScript'] );
-	}
-
-	return $metadata;
-}, 9 );
-add_filter( 'block_type_metadata', function( $metadata ) {
-	if ( isset( $metadata['_viewScript'] ) ) {
-		$metadata['viewScript'] = $metadata['_viewScript'];
-		unset( $metadata['_viewScript'] );
-	}
-
-	return $metadata;
-}, 11 );
