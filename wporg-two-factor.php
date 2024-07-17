@@ -21,9 +21,9 @@ defined( 'WPINC' ) || die();
  * todo remove this when launch for all users.
  * @codeCoverageIgnore
  */
-function is_2fa_beta_tester() : bool {
-	$user         = wp_get_current_user();
-	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley' );
+function is_2fa_beta_tester( $user = false ) : bool {
+	$user         = $user ?: wp_get_current_user();
+	$beta_testers = array( 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley', 'dufresnesteven' );
 
 	return in_array( $user->user_login, $beta_testers, true );
 }
@@ -229,7 +229,7 @@ function user_requires_2fa( $user ) : bool {
 	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
 		// 2FA is opt-in during beta testing.
 		// todo Remove this once we open it to all users.
-		if ( ! is_2fa_beta_tester() ) {
+		if ( ! is_2fa_beta_tester( $user ) ) {
 			return false;
 		}
 	}
