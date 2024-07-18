@@ -328,7 +328,7 @@ function block_webauthn_settings_page() {
  * @codeCoverageIgnore
  */
 function get_edit_account_url() : string {
-	return "https://profiles.wordpress.org/me/profile/edit/group/3";
+	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
 }
 
 /**
