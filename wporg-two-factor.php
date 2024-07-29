@@ -29,7 +29,7 @@ function is_2fa_beta_tester() : bool {
 }
 
 require_once __DIR__ . '/settings/settings.php';
-require_once __DIR__ . '/revalidation.php';
+require_once __DIR__ . '/revalidation/index.php';
 
 /**
  * Load the WebAuthn plugin.
