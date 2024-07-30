@@ -17,15 +17,20 @@ import Success from './success';
 
 export default function TOTP() {
 	const {
-		user: { totpEnabled },
+		user: { backupCodesEnabled, totpEnabled },
 		navigateToScreen,
 	} = useContext( GlobalContext );
 	const [ success, setSuccess ] = useState( false );
 
 	const afterTimeout = useCallback( () => {
 		setSuccess( false );
-		navigateToScreen( 'backup-codes' );
-	}, [ navigateToScreen ] );
+
+		if ( ! backupCodesEnabled ) {
+			navigateToScreen( 'backup-codes' );
+		} else {
+			navigateToScreen( 'account-status' );
+		}
+	}, [ backupCodesEnabled, navigateToScreen ] );
 
 	if ( success ) {
 		return (
@@ -117,9 +122,13 @@ function Setup( { setSuccess } ) {
 		<div className="wporg-2fa__totp_setup-container">
 			<p className="wporg-2fa__screen-intro">
 				Two-Factor Authentication adds an extra layer of security to your account. Use a
-				phone app like <a href="https://authy.com/">Authy</a> or{ ' ' }
+				phone app like{ ' ' }
 				<a href="https://support.google.com/accounts/answer/1066447">
 					Google Authenticator
+				</a>{ ' ' }
+				or{ ' ' }
+				<a href="https://www.microsoft.com/ko-kr/security/mobile-authenticator-app">
+					Microsoft Authenticator
 				</a>{ ' ' }
 				when logging in to WordPress.org.
 			</p>
@@ -386,7 +395,7 @@ function Manage() {
 			</div>
 
 			<p className="wporg-2fa__submit-actions">
-				<Button isPrimary onClick={ showConfirmDisableModal }>
+				<Button variant="secondary" onClick={ showConfirmDisableModal }>
 					Disable Two-Factor app
 				</Button>
 			</p>

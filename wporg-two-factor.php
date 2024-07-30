@@ -21,9 +21,9 @@ defined( 'WPINC' ) || die();
  * todo remove this when launch for all users.
  * @codeCoverageIgnore
  */
-function is_2fa_beta_tester() : bool {
-	$user         = wp_get_current_user();
-	$beta_testers = array( 'iandunn', 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley' );
+function is_2fa_beta_tester( $user = false ) : bool {
+	$user         = $user ?: wp_get_current_user();
+	$beta_testers = array( 'dd32', 'paulkevan', 'tellyworth', 'jeffpaul', 'bengreeley', 'dufresnesteven' );
 
 	return in_array( $user->user_login, $beta_testers, true );
 }
@@ -230,7 +230,7 @@ function user_requires_2fa( $user ) : bool {
 	if ( ! array_key_exists( 'phpunit_version', $GLOBALS ) ) {
 		// 2FA is opt-in during beta testing.
 		// todo Remove this once we open it to all users.
-		if ( ! is_2fa_beta_tester() ) {
+		if ( ! is_2fa_beta_tester( $user ) ) {
 			return false;
 		}
 	}
@@ -247,6 +247,47 @@ function user_requires_2fa( $user ) : bool {
 	}
 
 	return $required;
+}
+
+/**
+ * Check if the user *should* have 2FA enabled.
+ * This is not *required* yet, but highly encouraged.
+ *
+ * @param WP_User $user
+ */
+function user_should_2fa( $user ) : bool {
+	global $trusted_deputies, $wcorg_subroles;
+
+	// This shouldn't happen, but there've been a few times where it has inexplicably.
+	if ( ! $user instanceof WP_User ) {
+		return false;
+	}
+
+	// If they require it, they should have it.
+	// This duplicates the logic in `user_requires_2fa()`, due to the other uses of that function..
+	if ( is_special_user( $user->ID ) ) {
+		return true;
+	} elseif ( $trusted_deputies && in_array( $user->ID, $trusted_deputies, true ) ) {
+		return true;
+	} elseif ( $wcorg_subroles && array_key_exists( $user->ID, $wcorg_subroles ) ) {
+		return true;
+	}
+
+	/*
+	// If a user ... they should have 2FA enabled.
+	if (
+		// Is (or was) a plugin committer
+		$user->has_plugins ||
+		// Has (or had) a live theme
+		$user->has_themes ||
+		// Has (or had) an elevated role on a site (WordPress.org, BuddyPress.org, bbPress.org, WordCamp.org)
+		$user->has_elevated_role
+	) {
+		return true;
+	}
+ 	*/
+
+	return false;
 }
 
 /**
@@ -329,16 +370,7 @@ function block_webauthn_settings_page() {
  * @codeCoverageIgnore
  */
 function get_edit_account_url() : string {
-	$user = wp_get_current_user();
-
-	if ( function_exists( 'bbp_get_user_profile_edit_url' ) ) {
-		$url = bbp_get_user_profile_edit_url( $user->ID, $user->user_nicename ) . 'account/';
-	} else {
-		// Fallback for sites that don't have bbPress active.
-		$url = "https://wordpress.org/support/users/{$user->user_nicename}/edit/account/";
-	}
-
-	return $url;
+	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
 }
 
 /**
@@ -409,22 +441,3 @@ add_filter( 'two_factor_provider_classname_TwoFactor_Provider_WebAuthn', functio
 
 	return __NAMESPACE__ . '\WPORG_TwoFactor_Provider_WebAuthn';
 } );
-
-// Temp fix for TOTP QR code being broken, see: https://meta.trac.wordpress.org/timeline?from=2023-02-21T04%3A40%3A07Z&precision=second.
-// Hotfix for https://github.com/WordPress/gutenberg/pull/48268
-add_filter( 'block_type_metadata', function( $metadata ) {
-	if ( isset( $metadata['viewScript'] ) && ! empty( $metadata['file'] ) && ! str_contains( $metadata['file'], 'plugins/gutenberg/' ) ) {
-		$metadata['_viewScript'] = $metadata['viewScript'];
-		unset( $metadata['viewScript'] );
-	}
-
-	return $metadata;
-}, 9 );
-add_filter( 'block_type_metadata', function( $metadata ) {
-	if ( isset( $metadata['_viewScript'] ) ) {
-		$metadata['viewScript'] = $metadata['_viewScript'];
-		unset( $metadata['_viewScript'] );
-	}
-
-	return $metadata;
-}, 11 );

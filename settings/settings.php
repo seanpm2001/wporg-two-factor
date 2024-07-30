@@ -10,6 +10,7 @@ require __DIR__ . '/rest-api.php';
 add_action( 'plugins_loaded', __NAMESPACE__ . '\replace_core_ui_with_custom' ); // Must run after Two Factor plugin loaded.
 add_action( 'init', __NAMESPACE__ . '\register_block' );
 add_action( 'enqueue_block_assets', __NAMESPACE__ . '\maybe_dequeue_stylesheet', 40 );
+add_action( 'wp_head', __NAMESPACE__ . '\maybe_add_custom_print_css' );
 
 /**
  * Registers the block
@@ -162,9 +163,32 @@ function maybe_dequeue_stylesheet() {
 	global $wp;
 
 	// Match the URL since page/blog IDs etc aren't consistent across environments.
-	if ( 1 === preg_match( '#/users/.*/edit/account/#', $wp->request ) ) {
+	if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
 		return;
 	}
 
 	wp_dequeue_style( 'wporg-two-factor-settings-style' );
+}
+
+/**
+ * Add custom CSS for print styles.
+ */
+function maybe_add_custom_print_css() {
+    global $wp;
+
+    // Check if the current URL matches the specific condition
+    if ( 1 === preg_match( '#/profile/edit/group/3#', $wp->request ) ) {
+        ?>
+        <style>
+        @media print {
+            #item-header,
+            #headline,
+            footer,
+            .button-nav {
+                display: none !important;
+            }
+        }
+        </style>
+        <?php
+    }
 }
