@@ -1,5 +1,5 @@
 .wporg-2fa__backup-codes {
-	> * {
+	> *:not(:last-child) {
 		margin-bottom: 1em;
 	}
 
