@@ -117,7 +117,7 @@ function Setup( { setRegenerating } ) {
 		<>
 			<div className="wporg-2fa__screen-intro">
 				<p>
-					Backup codes let you access your account if your primary two-factor
+					Recovery codes let you access your account if your primary two-factor
 					authentication method is unavailable, like if your phone is lost or stolen. Each
 					code can only be used once.
 				</p>
@@ -126,7 +126,7 @@ function Setup( { setRegenerating } ) {
 
 				<Notice status="warning" isDismissible={ false }>
 					<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-					Without access to the one-time password app or a backup code, you will lose
+					Without access to the one-time password app or a recovery code, you will lose
 					access to your account. Once you navigate away from this page, you will not be
 					be able to view these codes again.
 				</Notice>
@@ -181,7 +181,7 @@ function CodeList( { codes } ) {
 		<div className="wporg-2fa__backup-codes-list">
 			{ ! codes.length && (
 				<p>
-					Generating backup codes...
+					Generating recovery codes...
 					<Spinner />
 				</p>
 			) }
@@ -216,14 +216,14 @@ function Manage( { setRegenerating } ) {
 		<>
 			<div className="wporg-2fa__screen-intro">
 				<p>
-					Backup codes let you access your account if your primary two-factor
+					Recovery codes let you access your account if your primary two-factor
 					authentication method is unavailable, like if your phone is lost or stolen. Each
 					code can only be used once.
 				</p>
 
 				{ backupCodesRemaining > 5 && (
 					<p>
-						You have <strong>{ backupCodesRemaining }</strong> backup codes remaining.
+						You have <strong>{ backupCodesRemaining }</strong> recovery codes remaining.
 					</p>
 				) }
 
@@ -231,7 +231,7 @@ function Manage( { setRegenerating } ) {
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
 						<div>
-							You only have <strong>{ backupCodesRemaining }</strong> backup codes
+							You only have <strong>{ backupCodesRemaining }</strong> recovery codes
 							remaining. Please regenerate and save new ones before you run out. If
 							you don&apos;t, you won&apos;t be able to log into your account if you
 							lose your phone.
@@ -241,7 +241,7 @@ function Manage( { setRegenerating } ) {
 			</div>
 
 			<Button isSecondary onClick={ () => setRegenerating( true ) }>
-				Generate new backup codes
+				Generate new recovery codes
 			</Button>
 		</>
 	);
