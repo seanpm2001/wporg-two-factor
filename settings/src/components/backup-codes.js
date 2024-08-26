@@ -18,8 +18,11 @@ import DownloadButton from './download-button';
 
 /**
  * Setup and manage backup codes.
+ *
+ * @param props
+ * @param props.onSuccess
  */
-export default function BackupCodes() {
+export default function BackupCodes( { onSuccess = () => {} } ) {
 	const {
 		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
 		backupCodesVerified,
@@ -32,10 +35,7 @@ export default function BackupCodes() {
 			<Notice status="error" isDismissible={ false }>
 				<Icon icon={ cancelCircleFilled } />
 				Please
-				<ScreenLink
-					screen="account-status"
-					anchorText="enable a Two-Factor security key or app"
-				/>
+				<ScreenLink screen="home" anchorText="enable a Two-Factor security key or app" />
 				before enabling backup codes.
 			</Notice>
 		);
@@ -47,7 +47,7 @@ export default function BackupCodes() {
 		regenerating ||
 		! backupCodesVerified
 	) {
-		return <Setup setRegenerating={ setRegenerating } />;
+		return <Setup setRegenerating={ setRegenerating } onSuccess={ onSuccess } />;
 	}
 
 	return <Manage setRegenerating={ setRegenerating } />;
@@ -58,8 +58,9 @@ export default function BackupCodes() {
  *
  * @param props
  * @param props.setRegenerating
+ * @param props.onSuccess
  */
-function Setup( { setRegenerating } ) {
+function Setup( { setRegenerating, onSuccess } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
@@ -108,9 +109,9 @@ function Setup( { setRegenerating } ) {
 		// TODO: Add try catch here after https://github.com/WordPress/wporg-two-factor/pull/187/files is merged.
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
 		setBackupCodesVerified( true );
-		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
 		setRegenerating( false );
+		onSuccess();
 	} );
 
 	return (
