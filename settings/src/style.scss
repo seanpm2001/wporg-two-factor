@@ -21,6 +21,7 @@ $alert-blue: #72aee6;
 	position: relative;
 	font-size: 14px;
 	font-family: 'Inter', sans-serif;
+	text-wrap: pretty;
 
 	> div.initial-load {
 		display: flex;
