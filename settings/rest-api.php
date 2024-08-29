@@ -4,6 +4,7 @@ namespace WordPressdotorg\Two_Factor;
 use Two_Factor_Core, Two_Factor_Totp, Two_Factor_Backup_Codes;
 use WildWolf\WordPress\TwoFactorWebAuthn\{ WebAuthn_Credential_Store };
 use WP_REST_Server, WP_REST_Request, WP_Error, WP_User;
+use function WordPressdotorg\Security\SVNPasswords\{ set_svn_password, get_svn_password_creation_date };
 
 defined( 'WPINC' ) || die();
 
@@ -126,6 +127,39 @@ function register_rest_routes() : void {
 					'type'     => 'string',
 					'validate_callback' => function( $status ) {
 						return 'enable' === $status || 'disable' === $status;
+					},
+				),
+			),
+		),
+	);
+
+	register_rest_route(
+		'wporg-two-factor/1.0',
+		'/generate-svn-password',
+		array(
+			'methods'  => WP_REST_Server::EDITABLE,
+			'callback' => function( $request ) {
+				$user = get_userdata( $request['user_id'] );
+
+				// Local environment doesn't have the SVN password system, just mock it.
+				if ( ! function_exists( 'WordPressdotorg\Security\SVNPasswords\set_svn_password' ) ) {
+					return 'Local Development: SVN Password system unavailable.';
+				}
+
+				return [
+					'svn_password' => set_svn_password( $user->ID )
+				];
+			},
+			'permission_callback' => function( $request ) {
+				return Two_Factor_Core::rest_api_can_edit_user_and_update_two_factor_options( $request['user_id'] );
+			},
+			'args' => array(
+				'user_id' => array(
+					'required' => true,
+					'type'     => 'number',
+					'sanitize_callback' => 'absint',
+					'validate_callback' => function( $user_id ) {
+						return get_userdata( $user_id ) instanceof WP_User;
 					},
 				),
 			),
@@ -320,6 +354,61 @@ function register_user_fields(): void {
 				'type'    => 'array',
 				'context' => [ 'edit' ],
 			],
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'svn_password_required',
+		[
+			'get_callback' => function( $user ) {
+				global $wpdb;
+
+				$user = get_userdata( $user['id'] );
+				if ( ! $user ) {
+					return false;
+				}
+
+				// Committers, supes, etc. It's likely these users will need a SVN password.
+				if ( function_exists( 'is_special_user' ) && is_special_user( $user->ID ) ) {
+					return true;
+				}
+
+				// Plugin committers & Theme authors have this user meta set.
+				if ( $user->has_plugins || $user->has_themes ) {
+					return true;
+				}
+
+				return false;
+			},
+			'schema' => [
+				'type'    => 'boolean',
+				'context' => [ 'edit' ],
+			]
+		]
+	);
+
+	register_rest_field(
+		'user',
+		'svn_password_created',
+		[
+			'get_callback' => function( $user ) {
+				// Local environment doesn't have the SVN password system, just return false for that.
+				if ( ! function_exists( 'WordPressdotorg\Security\SVNPasswords\get_svn_password_creation_date' ) ) {
+					return false;
+				}
+
+				$svn_password_created_date = get_svn_password_creation_date( $user['id'] );
+				if ( ! $svn_password_created_date ) {
+					return false;
+				}
+
+				return $svn_password_created_date;
+			},
+			'schema' => [
+				'type'    => [ 'boolean', 'string' ],
+				'context' => [ 'edit' ],
+			]
 		]
 	);
 

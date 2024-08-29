@@ -13,6 +13,7 @@ import EmailAddress from './email-address';
 import TOTP from './totp';
 import WebAuthn from './webauthn/webauthn';
 import BackupCodes from './backup-codes';
+import SVNPassword from './svn-password';
 
 import { GlobalContext } from '../script';
 
@@ -61,6 +62,10 @@ export default function Settings() {
 					} }
 				/>
 			),
+		},
+		'svn-password': {
+			title: 'SVN credentials',
+			component: <SVNPassword />,
 		},
 	};
 

@@ -18,7 +18,12 @@ export default function AccountStatus() {
 	const {
 		user: {
 			userRecord: {
-				record: { email, pending_email: pendingEmail },
+				record: {
+					email,
+					pending_email: pendingEmail,
+					svn_password_created: svnPasswordSet,
+					svn_password_required: svnPasswordRequired,
+				},
 			},
 			hasPrimaryProvider,
 			primaryProvider,
@@ -89,6 +94,23 @@ export default function AccountStatus() {
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
+
+			{ svnPasswordRequired || svnPasswordSet ? (
+				<SettingStatusCard
+					screen="svn-password"
+					status={
+						! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet
+					}
+					headerText="SVN credentials"
+					bodyText={
+						! svnPasswordSet
+							? 'You have not configured a SVN password for your account.'
+							: "You've got a SVN password configured for your account."
+					}
+				/>
+			) : (
+				''
+			) }
 		</div>
 	);
 }
