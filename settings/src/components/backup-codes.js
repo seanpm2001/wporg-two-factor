@@ -18,13 +18,15 @@ import DownloadButton from './download-button';
 
 /**
  * Setup and manage backup codes.
+ *
+ * @param props
+ * @param props.onSuccess
  */
-export default function BackupCodes() {
+export default function BackupCodes( { onSuccess = () => {} } ) {
 	const {
-		user: { backupCodesEnabled, hasPrimaryProvider, backupCodesRemaining },
-		backupCodesVerified,
+		user: { hasPrimaryProvider },
 	} = useContext( GlobalContext );
-	const [ regenerating, setRegenerating ] = useState( false );
+	const [ generating, setGenerating ] = useState( false );
 
 	// Prevent users from accessing directly through the URL.
 	if ( ! hasPrimaryProvider ) {
@@ -32,34 +34,27 @@ export default function BackupCodes() {
 			<Notice status="error" isDismissible={ false }>
 				<Icon icon={ cancelCircleFilled } />
 				Please
-				<ScreenLink
-					screen="account-status"
-					anchorText="enable a Two-Factor security key or app"
-				/>
+				<ScreenLink screen="home" anchorText="enable a Two-Factor security key or app" />
 				before enabling backup codes.
 			</Notice>
 		);
 	}
 
-	if (
-		! backupCodesEnabled ||
-		backupCodesRemaining === 0 ||
-		regenerating ||
-		! backupCodesVerified
-	) {
-		return <Setup setRegenerating={ setRegenerating } />;
-	}
-
-	return <Manage setRegenerating={ setRegenerating } />;
+	return generating ? (
+		<Setup setGenerating={ setGenerating } onSuccess={ onSuccess } />
+	) : (
+		<Manage setGenerating={ setGenerating } />
+	);
 }
 
 /**
  * Setup the Backup Codes provider.
  *
  * @param props
- * @param props.setRegenerating
+ * @param props.setGenerating
+ * @param props.onSuccess
  */
-function Setup( { setRegenerating } ) {
+function Setup( { setGenerating, onSuccess } ) {
 	const {
 		setGlobalNotice,
 		user: { userRecord },
@@ -108,21 +103,24 @@ function Setup( { setRegenerating } ) {
 		// TODO: Add try catch here after https://github.com/WordPress/wporg-two-factor/pull/187/files is merged.
 		// The codes have already been saved to usermeta, see `generateCodes()` above.
 		setBackupCodesVerified( true );
-		await refreshRecord( userRecord ); // This has the intended side-effect of redirecting to the Manage screen.
 		setGlobalNotice( 'Backup codes have been enabled.' );
-		setRegenerating( false );
+		setGenerating( false );
+		onSuccess();
 	} );
 
 	return (
 		<>
 			<div className="wporg-2fa__screen-intro">
-				<p>
-					Backup codes let you access your account if your primary two-factor
-					authentication method is unavailable, like if your phone is lost or stolen. Each
-					code can only be used once.
-				</p>
+				<IntroText />
 
 				<p>Please print the codes and keep them in a safe place.</p>
+
+				<Notice status="warning" isDismissible={ false }>
+					<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
+					Without access to the one-time password app or a backup code, you will lose
+					access to your account. Once you navigate away from this page, you will not be
+					be able to view these codes again.
+				</Notice>
 			</div>
 
 			{ error ? (
@@ -133,19 +131,6 @@ function Setup( { setRegenerating } ) {
 			) : (
 				<>
 					<CodeList codes={ backupCodes } />
-
-					<ButtonGroup>
-						<CopyToClipboardButton codes={ backupCodes } />
-						<PrintButton />
-						<DownloadButton codes={ backupCodes } />
-					</ButtonGroup>
-
-					<Notice status="warning" isDismissible={ false }>
-						<Icon icon={ warning } className="wporg-2fa__print-codes-warning" />
-						Without access to the one-time password app or a backup code, you will lose
-						access to your account. Once you navigate away from this page, you will not
-						be able to view these codes again.
-					</Notice>
 
 					<CheckboxControl
 						label="I have printed or saved these codes"
@@ -163,7 +148,7 @@ function Setup( { setRegenerating } ) {
 					disabled={ ! hasPrinted }
 					onClick={ handleFinished }
 				>
-					All Finished
+					Done
 				</Button>
 			</Flex>
 		</>
@@ -171,63 +156,74 @@ function Setup( { setRegenerating } ) {
 }
 
 /**
- * Display a list of backup codes
+ * Display a list of backup codes and actions
  *
  * @param props
  * @param props.codes
  */
 function CodeList( { codes } ) {
-	return (
-		<div className="wporg-2fa__backup-codes-list">
-			{ ! codes.length && (
-				<p>
-					Generating backup codes...
-					<Spinner />
-				</p>
-			) }
+	const hasCodes = !! codes.length;
 
-			{ codes.length > 0 && (
-				<ol>
-					{ codes.map( ( code ) => {
-						return (
-							<li key={ code } className="wporg-2fa__token">
-								{ code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
-							</li>
-						);
-					} ) }
-				</ol>
+	return (
+		<>
+			<div className="wporg-2fa__backup-codes-list">
+				{ hasCodes ? (
+					<ol>
+						{ codes.map( ( code ) => {
+							return (
+								<li key={ code } className="wporg-2fa__token">
+									{ code.slice( 0, 4 ) + ' ' + code.slice( 4 ) }
+								</li>
+							);
+						} ) }
+					</ol>
+				) : (
+					<p>
+						<Spinner /> Generating backup codes...
+					</p>
+				) }
+			</div>
+			{ hasCodes && (
+				<ButtonGroup>
+					<CopyToClipboardButton contents={ codes } />
+					<PrintButton />
+					<DownloadButton codes={ codes } />
+				</ButtonGroup>
 			) }
-		</div>
+		</>
 	);
 }
+
+const IntroText = () => (
+	<p>
+		Backup codes let you access your account if your primary two-factor authentication method is
+		unavailable, like if your phone is lost or stolen. Each code can only be used once.
+	</p>
+);
 
 /**
  * Render the screen where users can manage Backup Codes.
  *
  * @param props
- * @param props.setRegenerating
+ * @param props.setGenerating
  */
-function Manage( { setRegenerating } ) {
+function Manage( { setGenerating } ) {
 	const {
-		user: { backupCodesRemaining },
+		user: { backupCodesEnabled, backupCodesRemaining },
 	} = useContext( GlobalContext );
 
 	return (
 		<>
 			<div className="wporg-2fa__screen-intro">
-				<p>
-					Backup codes let you access your account if your primary two-factor
-					authentication method is unavailable, like if your phone is lost or stolen. Each
-					code can only be used once.
-				</p>
+				<IntroText />
 
-				{ backupCodesRemaining > 5 && (
+				{ backupCodesEnabled && backupCodesRemaining > 5 && (
 					<p>
 						You have <strong>{ backupCodesRemaining }</strong> backup codes remaining.
 					</p>
 				) }
 
-				{ backupCodesRemaining <= 5 && (
+				{ backupCodesEnabled && backupCodesRemaining <= 5 && (
 					<Notice status="warning" isDismissible={ false }>
 						<Icon icon={ warning } />
 						<div>
@@ -240,8 +236,10 @@ function Manage( { setRegenerating } ) {
 				) }
 			</div>
 
-			<Button isSecondary onClick={ () => setRegenerating( true ) }>
-				Generate new backup codes
+			<Button isSecondary onClick={ () => setGenerating( true ) }>
+				{ backupCodesEnabled
+					? 'Regenerate and save backup codes'
+					: 'Generate and save backup codes' }
 			</Button>
 		</>
 	);

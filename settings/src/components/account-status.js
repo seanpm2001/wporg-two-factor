@@ -18,7 +18,12 @@ export default function AccountStatus() {
 	const {
 		user: {
 			userRecord: {
-				record: { email, pending_email: pendingEmail },
+				record: {
+					email,
+					pending_email: pendingEmail,
+					svn_password_created: svnPasswordSet,
+					svn_password_required: svnPasswordRequired,
+				},
 			},
 			hasPrimaryProvider,
 			primaryProvider,
@@ -34,7 +39,7 @@ export default function AccountStatus() {
 			? 'Please enable a Two-Factor security key or app before enabling backup codes.'
 			: `You have
 				${ backupCodesEnabled ? '' : 'not' }
-				verified your backup codes for two-factor authentication.`;
+				verified your backup codes.`;
 
 	return (
 		<div className={ 'wporg-2fa__account-status' }>
@@ -48,7 +53,7 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="email"
 				status={ emailStatus }
-				headerText="Account Email"
+				headerText="Account email"
 				bodyText={
 					pendingEmail
 						? `Your account email is pending a change to ${ pendingEmail }.`
@@ -59,11 +64,11 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="webauthn"
 				status={ hasPrimaryProvider && ! webAuthnEnabled ? 'info' : webAuthnEnabled }
-				headerText="Two-Factor Security Key"
+				headerText="Two-factor security key"
 				bodyText={
 					webAuthnEnabled
 						? 'You have two-factor authentication enabled using security keys.'
-						: 'You have not enabled security keys for two-factor authentication.'
+						: 'You have not enabled security keys.'
 				}
 				isPrimary={ 'TwoFactor_Provider_WebAuthn' === primaryProvider && totpEnabled }
 			/>
@@ -71,11 +76,11 @@ export default function AccountStatus() {
 			<SettingStatusCard
 				screen="totp"
 				status={ hasPrimaryProvider && ! totpEnabled ? 'info' : totpEnabled }
-				headerText="Two-Factor App"
+				headerText="Two-factor app"
 				bodyText={
 					totpEnabled
 						? 'You have two-factor authentication enabled using an app.'
-						: 'You have not enabled an app for two-factor authentication.'
+						: 'You have not enabled an app.'
 				}
 				isPrimary={ 'Two_Factor_Totp' === primaryProvider && webAuthnEnabled }
 			/>
@@ -85,10 +90,27 @@ export default function AccountStatus() {
 				status={
 					! hasPrimaryProvider && ! backupCodesEnabled ? 'pending' : backupCodesEnabled
 				}
-				headerText="Two-Factor Backup Codes"
+				headerText="Two-factor backup codes"
 				bodyText={ backupBodyText }
 				disabled={ ! hasPrimaryProvider }
 			/>
+
+			{ svnPasswordRequired || svnPasswordSet ? (
+				<SettingStatusCard
+					screen="svn-password"
+					status={
+						! svnPasswordRequired && ! svnPasswordSet ? 'info' : !! svnPasswordSet
+					}
+					headerText="SVN credentials"
+					bodyText={
+						! svnPasswordSet
+							? 'You have not configured a SVN password for your account.'
+							: 'You have an SVN password configured for your account.'
+					}
+				/>
+			) : (
+				''
+			) }
 		</div>
 	);
 }

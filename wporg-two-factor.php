@@ -30,6 +30,7 @@ function is_2fa_beta_tester( $user = false ) : bool {
 
 require_once __DIR__ . '/settings/settings.php';
 require_once __DIR__ . '/revalidation/index.php';
+require_once __DIR__ . '/stats.php';
 
 /**
  * Load the WebAuthn plugin.
@@ -77,7 +78,6 @@ add_action( 'set_current_user', __NAMESPACE__ . '\remove_super_admins_until_2fa_
 add_action( 'login_redirect', __NAMESPACE__ . '\redirect_to_2fa_settings', 105, 3 ); // After `wporg_remember_where_user_came_from_redirect()`, before `WP_WPorg_SSO::redirect_to_policy_update()`.
 add_action( 'user_has_cap', __NAMESPACE__ . '\remove_capabilities_until_2fa_enabled', 99, 4 ); // Must run _after_ all other plugins.
 add_action( 'current_screen', __NAMESPACE__ . '\block_webauthn_settings_page' );
-add_action( 'two_factor_user_authenticated', __NAMESPACE__ . '\two_factor_user_authenticated', 10, 2 );
 
 /**
  * Determine which providers should be available to users.
@@ -308,7 +308,7 @@ function redirect_to_2fa_settings( string $redirect_to, string $requested_redire
 		return $redirect_to;
 	}
 
-	return get_edit_account_url();
+	return get_onboarding_account_url();
 }
 
 /**
@@ -341,7 +341,7 @@ function get_enable_2fa_notice( string $existing_notices = '' ) : string {
 			'Your account has elevated privileges and requires extra security before you can continue. Please <a href="%s">enable two-factor authentication</a>.',
 			'wporg'
 		),
-		get_edit_account_url()
+		get_onboarding_account_url()
 	);
 
 	return $two_factor_notice . $existing_notices;
@@ -372,6 +372,15 @@ function block_webauthn_settings_page() {
  */
 function get_edit_account_url() : string {
 	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
+}
+
+/**
+ * Get the URL of the onboarding screen.
+ *
+ * @codeCoverageIgnore
+ */
+function get_onboarding_account_url() : string {
+	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/security';
 }
 
 /**
@@ -423,20 +432,6 @@ function after_provider_deactivated( $user_id, $provider = null ) {
 			'two-factor-login'    => null,
 		] );
 	}
-}
-
-/**
- * Record stats for number of authentications per provider per day.
- */
-function two_factor_user_authenticated( $user_id, $provider ) {
-	if ( ! function_exists( 'bump_stats_extra' ) || ! $provider ) {
-		return;
-	}
-
-	$provider = str_ireplace( [ 'TwoFactor_Provider_', 'Two_Factor_' ], '', $provider->get_key() );
-	$provider = str_replace( '_', ' ', $provider );
-
-	bump_stats_extra( 'two-factor-auth', $provider );
 }
 
 /*
