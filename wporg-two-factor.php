@@ -368,17 +368,35 @@ function block_webauthn_settings_page() {
  * Get the URL of the Edit Account screen.
  *
  * @codeCoverageIgnore
+ *
+ * @param int|WP_User $user Optional. The user to get the URL for. Default is the current user.
+ * @return string
  */
-function get_edit_account_url() : string {
-	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/edit/group/3';
+function get_edit_account_url( $user = false ) : string {
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	} elseif ( is_numeric( $user ) ) {
+		$user = get_user_by( 'id', $user );
+	}
+
+	return 'https://profiles.wordpress.org/' . ( $user->user_nicename ?? 'me' ) . '/profile/edit/group/3/';
 }
 
 /**
  * Get the URL of the onboarding screen.
  *
  * @codeCoverageIgnore
+ *
+ * @param int|WP_User $user Optional. The user to get the URL for. Default is the current user.
+ * @return string
  */
-function get_onboarding_account_url() : string {
+function get_onboarding_account_url( $user = false ) : string {
+	if ( ! $user ) {
+		$user = wp_get_current_user();
+	} elseif ( is_numeric( $user ) ) {
+		$user = get_user_by( 'id', $user );
+	}
+
 	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/security';
 }
 
