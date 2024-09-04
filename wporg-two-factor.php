@@ -397,7 +397,7 @@ function get_onboarding_account_url( $user = false ) : string {
 		$user = get_user_by( 'id', $user );
 	}
 
-	return 'https://profiles.wordpress.org/' . ( wp_get_current_user()->user_nicename ?? 'me' ) . '/profile/security';
+	return 'https://profiles.wordpress.org/' . ( $user->user_nicename ?? 'me' ) . '/profile/security';
 }
 
 /**
